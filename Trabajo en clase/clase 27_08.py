@@ -39,12 +39,24 @@ vmax = np.sqrt(2) #amp max
 dc = 0 #offset
 ff = 3 #Frecuencia sinusoidal (Hz)
 ph = 0 #rad
-SNR = 10 #dB
+#SNR = 10#dB
 Psen = 1 #Potencia media senoide [Watt]
 ur = 0 #Media del ruido
 
 k=4
 delta_f=1
+#%%ADC
+B=4 #bits
+Vfs= 1.65 #Volts
+qq= 2*Vfs/(2**B)
+#calcular la potencia de ese qq y desp el SNR de la senoidal 
+Pq= qq**2/12
+k=10
+Pr= k*Pq
+#potencia del seno 
+Psen = vmax**2 / 2
+#ahora si calculo el SNR 
+SNR = 10 * np.log10(Psen / Pr)
 
 
 #%% ------------------------- FUNCIONES -------------------------
@@ -78,6 +90,7 @@ def gen_noise (SNR = SNR, Psen = Psen, ur = ur, nn = N):
 B=6 #bits
 Vfs= 1.65 #Volts
 qq= 2*Vfs/(2**B)
+#calcular la potencia de ese qq y desp el SNR de la senoidal 
 #%% ------------------------ MAIN SCRIPT ------------------------
 
 #Invoco la función generadora de senoides
@@ -100,7 +113,7 @@ A = nXX[:N//2]
 # Espectro del módulo
 flg, (ax1,ax2)= plt.subplots(2,1, figsize=(8,8))
 
-ax1.plot(frec, 20*np.log10(2*(np.abs(nXX[:N//2])**2))) #normalizo el ruido a 0db
+ax1.plot(frec, 10*np.log10(2*(np.abs(nXX[:N//2])**2))) #normalizo el ruido a 0db
 ax1.set_xlabel("Frecuencia [Hz]")
 ax1.set_ylabel("Módulo")
 plt.grid(True)
@@ -115,9 +128,13 @@ plt.grid(True)
 plt.tight_layout()
 plt.show()
 
+
+
+
 #%%Cuantizamos
 xx_q= np.round(noisy_xx/qq)*qq
 
+#ruido cuantizacion
 ruido_q= xx_q - noisy_xx
 
 plt.figure()
@@ -171,4 +188,42 @@ if resultado.pvalue < alpha:
 else: 
     print("No hay evidencia suficiente para confirmar que la señal no sigue una distribución uniforme.")
 
+#%% clase 02/09
 
+def espectro_potencia(x):
+    X = np.fft.fft(x) / N
+    P = 2 * np.abs(X[:N//2])**2  #aca me quedo solo con el rango de 0 a nyquist
+    P_db = 10 * np.log10(P + 1e-20) #el valor chico queda para que si P=0 no me tire error
+    return P_db
+
+
+P_s = espectro_potencia(xx)
+P_in = espectro_potencia(noisy_xx)
+P_q = espectro_potencia(xx_q)
+
+P_ruido = espectro_potencia(ruido)
+P_ruido_q = espectro_potencia(ruido_q)
+
+#valores medios
+piso_ruido = 10*np.log10(np.mean(10**(P_ruido/10)))
+piso_ruido_q = 10*np.log10(np.mean(10**(P_ruido_q/10)))
+
+
+plt.figure(figsize=(12,6))
+
+plt.plot(frec, P_q,
+         label="ADC out")
+
+
+plt.plot(frec, P_ruido, "--",
+         label= "piso analogico")
+plt.plot(frec, P_ruido_q, ":",
+         label="piso digital")
+plt.xlabel("Frecuencia [Hz]")
+plt.ylabel("Densidad de Potencia [dB]")
+plt.title("Señal muestreada por un ADC")
+
+plt.grid()
+plt.legend()
+plt.tight_layout()
+plt.show()
