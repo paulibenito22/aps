@@ -60,7 +60,6 @@ wd=np.pi/4
 y= np.cos(wd* n) - np.cos(wd * (n-4)) 
 n= np.arange(-10,10)
 
-
 plt.figure()
 plt.stem(n, y)
 plt.axhline(0)
