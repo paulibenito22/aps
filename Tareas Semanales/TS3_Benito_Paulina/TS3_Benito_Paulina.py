@@ -27,6 +27,7 @@ nn,xx= funcion_sen(vmax, dc, k, ph, N, fs)
 frec=np.arange(N//2) * fs/N
 nXX = 1/N*np.fft.fft(xx)
 
+plt.figure()
 plt.plot(frec, 10*np.log10(2*(np.abs(nXX[:N//2])**2)), ':o', label='k=N/4')
 plt.grid()
 
@@ -35,7 +36,9 @@ plt.grid()
 nn,xx2= funcion_sen(vmax, dc, k+0.25, ph, N, fs)
 eXX = 1/N*np.fft.fft(xx2)
 
+plt.figure()
 plt.plot(frec, 10*np.log10(2*(np.abs(eXX[:N//2])**2)),':x')
+plt.title("k+0.25")
 plt.grid(True)
 
 
@@ -44,7 +47,9 @@ plt.grid(True)
 nn,xx3= funcion_sen(vmax, dc, k+0.5, ph, N, fs)
 aXX = 1/N*np.fft.fft(xx3)
 
+plt.figure()
 plt.plot(frec, 10*np.log10(2*(np.abs(aXX[:N//2])**2)),':v')
+plt.title("k+0.5")
 plt.grid(True)
 
 
@@ -55,6 +60,7 @@ xxpadding = np.concatenate((xx, ceros))
 
 frec2=np.arange(10*N//2) * fs/N
 pXX=(1/N)*np.fft.fft(xxpadding)
+
 
 plt.figure()
 plt.plot(frec2, 10*np.log10(2*(np.abs(pXX[:10*N//2])**2)),'x')
