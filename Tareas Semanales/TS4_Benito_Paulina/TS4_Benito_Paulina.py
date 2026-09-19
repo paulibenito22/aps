@@ -8,6 +8,7 @@ Created on Wed Sep  9 19:20:41 2026
 
 import numpy as np 
 import matplotlib.pyplot as plt
+from spicy import signal
 
 #%%
 fs=1000
@@ -123,7 +124,9 @@ print(sesgo)
 # Xventana= np.fft.fft(ventana)
 # estimador1= np.abs(Xventana)
     
+#%% otra ventana: flattop
 
+w= signal.window.flattop()
 
 
 
