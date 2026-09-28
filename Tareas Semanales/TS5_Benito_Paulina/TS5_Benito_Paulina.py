@@ -69,21 +69,20 @@ print(len(ecg_one_lead))
 # Lectura de pletismografía (PPG)  #
 ####################################
 
-# fs_ppg = 400 # Hz
+fs_ppg = 400 # Hz
 
 # # ##################
 # # ## PPG con ruido
 # # ##################
 
-# # # # Cargar el archivo CSV como un array de NumPy
-# ppg = np.genfromtxt('PPG.csv', delimiter=',', skip_header=1)  # Omitir la cabecera si existe
+# # Cargar el archivo CSV como un array de NumPy
+ #ppg = np.genfromtxt('PPG.csv', delimiter=',', skip_header=1)  # Omitir la cabecera si existe
 
 
 # ##################
 # ## PPG sin ruido
 # ##################
-
-# ppg = np.load('ppg_sin_ruido.npy')
+ppg = np.load('ppg_sin_ruido.npy')
 
 # plt.figure()
 # plt.plot(ppg)
@@ -96,9 +95,9 @@ print(len(ecg_one_lead))
 # ####################
 
 # # Cargar el archivo CSV como un array de NumPy
-# fs_audio, wav_data = sio.wavfile.read('la cucaracha.wav')
-# fs_audio, wav_data = sio.wavfile.read('prueba psd.wav')
-# fs_audio, wav_data = sio.wavfile.read('silbido.wav')
+fs_audio1, wav_data1 = sio.wavfile.read('la cucaracha.wav')
+fs_audio2, wav_data2 = sio.wavfile.read('prueba psd.wav')
+fs_audio3, wav_data3 = sio.wavfile.read('silbido.wav')
 
 # plt.figure()
 # plt.plot(wav_data)
@@ -130,27 +129,234 @@ for l in L:
 
 # GRAFICO
 
-plt.figure(figsize=(12,6))
+# plt.figure(figsize=(12,6))
 
-for i in range(len(arrwelch_ECG)):
-    plt.plot(
-        arrwelch_ECG[i][0],
-        arrwelch_ECG[i][1],
-        label=f'K = {K[i]:.0f}'
-    )
+# for i in range(len(arrwelch_ECG)):
+#     plt.plot(
+#         arrwelch_ECG[i][0],
+#         arrwelch_ECG[i][1],
+#         label=f'K = {K[i]:.0f}'
+#     )
 
-plt.xlabel('Frecuencia [Hz]')
-plt.ylabel('PSD')
-plt.title('Welch para distintos valores de K')
-plt.legend()
-plt.grid()
+# plt.xlabel('Frecuencia [Hz]')
+# plt.ylabel('PSD')
+# plt.title('Welch para distintos valores de K')
+# plt.legend()
+# plt.grid()
 
-plt.show()
+# plt.show()
 
 # plt.figure()
 # plt.plot(welch_ECG[0], welch_ECG[1])
 # plt.title(f"welch ECG con K={K}")
 # plt.show()
 
+#%%ppg 
+N = len(ppg)
+K = np.array([20,25,28, 30])
+L = N / K
+
+arrwelch_PPG = []
+for l in L:
+    welch_PPG = sig.welch(
+        ppg,
+        fs_ppg,
+        window='boxcar',
+        nperseg=int(l),
+        noverlap=int(l/2),
+        nfft=N
+    )
+    
+    arrwelch_PPG.append(welch_PPG)
+# plt.figure(figsize=(12,6))
+
+# for i in range(len(arrwelch_PPG)):
+#     plt.plot(
+#         arrwelch_PPG[i][0],
+#         arrwelch_PPG[i][1],
+#         label=f'K = {K[i]}'
+#     )
+
+# plt.xlabel('Frecuencia [Hz]')
+# plt.ylabel('PSD')
+# plt.title('Welch para distintos valores de K')
+# plt.legend()
+# plt.grid()
+# plt.show()
+
+#%% audio la cucaracha
+N = len(wav_data1)
+K = np.array([40, 43, 48, 50])
+L = N / K
+
+arrwelch_audio1 = []
+for l in L:
+    welch_audio1 = sig.welch(
+        wav_data1,
+        fs_audio1,
+        window='boxcar',
+        nperseg=int(l),
+        noverlap=int(l/2),
+        nfft=N
+    )
+    
+    arrwelch_audio1.append(welch_audio1)
+plt.figure(figsize=(14,5))
+
+# ESPECTRO COMPLETO
+# plt.subplot(1,2,1)
+
+# for i in range(len(arrwelch_audio1)):
+#     plt.plot(
+#         arrwelch_audio1[i][0],
+#         arrwelch_audio1[i][1],
+#         label=f'K = {K[i]}'
+#     )
+
+# plt.xlabel('Frecuencia [Hz]')
+# plt.ylabel('PSD')
+# plt.title('PSD del audio - espectro completo')
+# plt.legend()
+# plt.grid()
 
 
+# # ZOOM
+# plt.subplot(1,2,2)
+
+# for i in range(len(arrwelch_audio1)):
+#     plt.plot(
+#         arrwelch_audio1[i][0],
+#         arrwelch_audio1[i][1],
+#         label=f'K = {K[i]}'
+#     )
+
+# plt.xlim(0, 2100)
+
+# plt.xlabel('Frecuencia [Hz]')
+# plt.ylabel('PSD')
+# plt.title('PSD del audio - detalle en bajas frecuencias')
+# plt.legend()
+# plt.grid()
+
+# plt.tight_layout()
+# plt.show()
+
+#%% audio prueba psd 
+N = len(wav_data2)
+K = np.array([40, 43, 48, 50])
+L = N / K
+
+arrwelch_audio2 = []
+for l in L:
+    welch_audio2 = sig.welch(
+        wav_data2,
+        fs_audio2,
+        window='boxcar',
+        nperseg=int(l),
+        noverlap=int(l/2),
+        nfft=N
+    )
+    
+    arrwelch_audio2.append(welch_audio2)
+plt.figure(figsize=(14,5))
+
+# # ESPECTRO COMPLETO
+# plt.subplot(1,2,1)
+
+# for i in range(len(arrwelch_audio2)):
+#     plt.plot(
+#         arrwelch_audio2[i][0],
+#         arrwelch_audio2[i][1],
+#         label=f'K = {K[i]}'
+#     )
+
+# plt.xlabel('Frecuencia [Hz]')
+# plt.ylabel('PSD')
+# plt.title('PSD del audio - espectro completo')
+# plt.legend()
+# plt.grid()
+
+
+# # ZOOM
+# plt.subplot(1,2,2)
+
+# for i in range(len(arrwelch_audio2)):
+#     plt.plot(
+#         arrwelch_audio2[i][0],
+#         arrwelch_audio2[i][1],
+#         label=f'K = {K[i]}'
+#     )
+
+# plt.xlim(0, 2100)
+
+# plt.xlabel('Frecuencia [Hz]')
+# plt.ylabel('PSD')
+# plt.title('PSD del audio - detalle en bajas frecuencias')
+# plt.legend()
+# plt.grid()
+
+# plt.tight_layout(rect=[0,0.05,1,1])
+# plt.figtext(0.5, 0.02,
+#             "Figura 8. Estimación de la PSD mediante diferentes valores de K con el método Welch. ",
+#             ha="center")
+# plt.show()
+
+#%% silbido
+N = len(wav_data3)
+K = np.array([43, 48, 50, 53])
+L = N / K
+
+arrwelch_audio3 = []
+for l in L:
+    welch_audio3 = sig.welch(
+        wav_data3,
+        fs_audio3,
+        window='boxcar',
+        nperseg=int(l),
+        noverlap=int(l/2),
+        nfft=N
+    )
+    
+    arrwelch_audio3.append(welch_audio3)
+plt.figure(figsize=(14,5))
+
+# ESPECTRO COMPLETO
+plt.subplot(1,2,1)
+
+for i in range(len(arrwelch_audio3)):
+    plt.plot(
+        arrwelch_audio3[i][0],
+        arrwelch_audio3[i][1],
+        label=f'K = {K[i]}'
+    )
+
+plt.xlabel('Frecuencia [Hz]')
+plt.ylabel('PSD')
+plt.title('PSD del audio - espectro completo')
+plt.legend()
+plt.grid()
+
+
+# ZOOM
+plt.subplot(1,2,2)
+
+for i in range(len(arrwelch_audio3)):
+    plt.plot(
+        arrwelch_audio3[i][0],
+        arrwelch_audio3[i][1],
+        label=f'K = {K[i]}'
+    )
+
+plt.xlim(2500, 7000)
+
+plt.xlabel('Frecuencia [Hz]')
+plt.ylabel('PSD')
+plt.title('PSD del audio - detalle en bajas frecuencias')
+plt.legend()
+plt.grid()
+
+plt.tight_layout(rect=[0,0.05,1,1])
+plt.figtext(0.5, 0.02,
+            "Figura 9. Estimación de la PSD mediante diferentes valores de K con el método Welch. ",
+            ha="center")
+plt.show()
